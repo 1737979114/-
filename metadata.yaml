@@ -4,7 +4,7 @@ desc: "适配 QQ 官方机器人的综合群管：禁言、解禁、踢人、撤
 short_desc: "官方机器人专用群管：禁言、踢人、撤回、AI 审核"
 version: 1.4.0
 author: 1737979114
-repo: ""  # TODO: 填你的 GitHub 仓库地址，如 https://github.com/you/astrbot_plugin_qq_group_admin
+repo: https://github.com/1737979114/-
 astrbot_version: ">=4.24.0,<5"
 support_platforms:
   - qq_official
