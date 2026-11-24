@@ -62,6 +62,7 @@
     "options": [
       "recall",
       "mute",
+      "recall_mute",
       "warn"
     ],
     "default": "recall"
@@ -121,6 +122,37 @@
     "default": "",
     "_special": "select_provider",
     "hint": "留空使用会话默认模型"
+  },
+  "moderation_images": {
+    "description": "审核图片",
+    "type": "bool",
+    "default": false,
+    "hint": "先用视觉模型把图片转成文字描述，再走规则词与模型判定；每张图一次模型调用，会产生额外费用，默认关闭"
+  },
+  "image_provider_id": {
+    "description": "图片转述模型",
+    "type": "string",
+    "default": "",
+    "_special": "select_provider",
+    "hint": "留空自动使用 AstrBot 配置里的「群聊图片转述模型」；该模型必须支持图片输入"
+  },
+  "review_enabled": {
+    "description": "记录放行内容（人工复审）",
+    "type": "bool",
+    "default": true,
+    "hint": "把审核通过的消息留一份到 review.db，后台「放行复审」页可以回看并标注漏判。关闭后不再新增记录，已有数据仍可查看"
+  },
+  "review_limit": {
+    "description": "放行记录保留条数",
+    "type": "int",
+    "default": 2000,
+    "hint": "超过后自动删除最旧的记录，范围 100~20000。按每天 300 条估算，2000 条约等于一周"
+  },
+  "review_keep_image": {
+    "description": "复审留存原图",
+    "type": "bool",
+    "default": true,
+    "hint": "为放行消息里的图片也复制一份到 media 目录，才能在复审页看到原图；media 目录最多保留 300 张，超出删旧"
   },
   "spam_enabled": {
     "description": "开启刷屏检测",
@@ -189,6 +221,12 @@
     "type": "bool",
     "default": true
   },
+  "misjudge_learn": {
+    "description": "记住误判样本",
+    "type": "bool",
+    "default": true,
+    "hint": "在违规记录里点「误判」时，把这条文本记下来，下次原样出现直接放行；只学模型判定的误判，规则词误判请去规则中心删词。样本可在规则中心查看和删除，最多 200 条"
+  },
   "group_whitelist": {
     "description": "不审核的群 openid",
     "type": "list",
@@ -203,5 +241,17 @@
     "description": "命令冷却（秒）",
     "type": "int",
     "default": 0
+  },
+  "auto_unmute": {
+    "description": "禁言到期自动解禁",
+    "type": "bool",
+    "default": true,
+    "hint": "插件记录禁言到期时间，到点自动调用解禁接口；重启后计划不丢"
+  },
+  "group_admins": {
+    "description": "群管理员（按群）",
+    "type": "text",
+    "default": "{}",
+    "hint": "JSON：{\"群 openid\": [\"成员 openid\", ...]}。这里的人只在自己群里能执行管理命令；全局管理员名单对所有群生效"
   }
 }

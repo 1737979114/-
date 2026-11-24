@@ -192,7 +192,97 @@
   .panel .body.tight { padding: 0; }
 
   .muted { color: var(--muted); font-size: 12.5px; }
+  .quote {
+    color: var(--muted); font-size: 12px; margin-top: 3px; word-break: break-all;
+    border-left: 2px solid var(--line, rgba(128,128,128,.35)); padding-left: 6px;
+  }
+  .evi { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .evi img.thumb {
+    width: 56px; height: 56px; object-fit: cover; border-radius: 8px;
+    border: 1px solid var(--line, rgba(128,128,128,.35)); cursor: zoom-in;
+    background: rgba(128,128,128,.12);
+  }
+  .evi .copy { font-size: 12px; padding: 3px 8px; }
+
+  .media-modal {
+    position: fixed; inset: 0; z-index: 999; display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, .72); backdrop-filter: blur(2px);
+  }
+  .media-modal.show { display: flex; }
+  .media-modal .media-box {
+    max-width: 94vw; max-height: 94vh; display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
+  }
+  .media-modal img {
+    max-width: 94vw; max-height: 84vh; border-radius: 10px;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, .45); background: #111;
+  }
+  .media-modal .hint { color: #d7d7d7; font-size: 12px; }
+  .media-modal .bar { display: flex; gap: 8px; }
   .empty { color: var(--muted); text-align: center; padding: 34px 10px; font-size: 13px; }
+
+  /* 成员页的说明卡 */
+  .notice {
+    margin: 14px 16px;
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    font-size: 12.8px;
+    line-height: 1.85;
+  }
+  .notice:first-child { margin-top: 16px; }
+  .notice .n-h { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
+  .notice .n-b { color: var(--muted); }
+  .notice .n-b b { color: var(--text); font-weight: 600; }
+  .notice.ok { border-color: rgba(34, 197, 94, 0.35); background: rgba(34, 197, 94, 0.07); }
+  .notice.ok .n-h { color: var(--ok); }
+  .notice.warn { border-color: rgba(245, 158, 11, 0.35); background: rgba(245, 158, 11, 0.07); }
+  .notice.warn .n-h { color: var(--warn); }
+  .notice .kv { display: flex; gap: 8px; }
+  .notice .kv .k { color: var(--muted); min-width: 92px; flex: none; }
+  .notice .kv .v { color: var(--text); word-break: break-all; }
+
+  .sub-h {
+    padding: 14px 16px 8px;
+    font-size: 12.8px;
+    font-weight: 600;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sub-h .muted { font-weight: 400; }
+
+  #members-table { overflow-x: auto; }
+  td .row-actions { display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; }
+  td .row-actions button,
+  td .row-actions select { white-space: nowrap; flex: none; }
+  td .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+    gap: 10px;
+  }
+  .stat {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-width: 0;
+  }
+  .stat span { display: block; color: var(--muted); font-size: 11.5px; margin-bottom: 4px; }
+  .stat b {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  select.mini { width: auto; padding: 3px 6px; font-size: 12px; border-radius: 7px; }
 
   button {
     font: inherit;
@@ -212,7 +302,7 @@
   button.ghost { background: transparent; }
   button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  input[type="text"], input[type="password"], input[type="number"], select, textarea {
+  input[type="text"], input[type="password"], input[type="number"], input:not([type]), select, textarea {
     width: 100%;
     padding: 8px 10px;
     border-radius: 8px;
@@ -412,6 +502,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
       <span>违规记录</span>
     </button>
+    <button class="nav-item" data-page="review">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16v14H4z"/><path d="M7.5 12l2 2 3-3.5"/><path d="M15 12h3"/></svg>
+      <span>放行复审</span>
+    </button>
     <button class="nav-item" data-page="members">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/></svg>
       <span>成员查询</span>
@@ -484,11 +578,24 @@
 
     <section class="page" id="page-groups">
       <div class="panel">
-        <div class="head"><h2>群列表</h2><div class="spacer"></div><span class="muted" id="groups-total">0 个群</span></div>
-        <div class="body"><div class="group-grid" id="groups-grid"></div></div>
+        <div class="head">
+          <h2>群列表</h2><div class="spacer"></div>
+          <span class="muted" id="groups-total">0 个群</span>
+          <button class="sm" id="btn-groups-sync">同步群列表</button>
+          <button class="sm" id="btn-groups-refresh">刷新</button>
+        </div>
+        <div class="body">
+          <div class="row" style="align-items:flex-end;gap:8px;margin-bottom:14px">
+            <div class="field" style="flex:1"><label>手动登记群（群 openid）</label><input id="group-add-input" placeholder="例如 1A2B3C4D5E6F…" /></div>
+            <button class="sm" id="btn-group-add" style="flex:none;white-space:nowrap">添加</button>
+          </div>
+          <div class="group-grid" id="groups-grid"></div>
+        </div>
       </div>
       <div class="muted" style="line-height:1.8">
-        官方开放平台没有「群列表」接口，这里只统计机器人实际收到过消息的群。想让机器人感知更多群，需要在管理端开启「接收所有消息」。
+        官方<b>没有群列表接口</b>，所以这里只能列「本地知道的群」：机器人被 @ 过的群、以及 AstrBot 消息历史里出现过的群。
+        「同步群列表」会重新扫一遍这些线索，并逐个查群名确认机器人还在群里。<br />
+        从没被 @ 过的群仍然看不到，这类把群 openid 填到上面手动登记即可（群 openid 可以看「成员查询」里的群信息，或从入群欢迎记录里拿）。
       </div>
     </section>
 
@@ -504,6 +611,46 @@
           <span class="info" id="records-info">共 0 条</span>
           <button class="sm" id="records-prev">上一页</button>
           <button class="sm" id="records-next">下一页</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-review">
+      <div class="panel">
+        <div class="head">
+          <h2>放行内容复审</h2><div class="spacer"></div>
+          <span class="muted" id="review-summary">—</span>
+          <button class="sm" id="btn-review-refresh">刷新</button>
+          <button class="sm danger" id="btn-review-clear">清空</button>
+        </div>
+        <div class="body">
+          <div class="row" style="margin-bottom:10px">
+            <input id="review-q" type="text" placeholder="搜索内容 / 成员 / 群名" />
+            <select id="review-group" style="width:180px"><option value="">全部群</option></select>
+            <select id="review-state" style="width:132px">
+              <option value="pending">待复审</option>
+              <option value="">全部状态</option>
+              <option value="clean">已确认正常</option>
+              <option value="violation">判定漏判</option>
+              <option value="ignored">已忽略</option>
+            </select>
+            <select id="review-source" style="width:160px"><option value="">全部来源</option></select>
+            <button class="primary" id="btn-review-search" style="flex:none">筛选</button>
+          </div>
+          <div class="row" style="margin-bottom:12px">
+            <label class="muted" style="flex:none;display:flex;align-items:center;gap:6px">
+              <input type="checkbox" id="review-risk" style="width:auto" /> 只看高风险（模型没真的看）
+            </label>
+            <div class="spacer" style="flex:1"></div>
+            <button class="sm" id="btn-review-clean">批量标为正常</button>
+            <button class="sm" id="btn-review-ignore">批量忽略</button>
+          </div>
+          <div id="review-table"></div>
+        </div>
+        <div class="pager">
+          <span class="info" id="review-info">共 0 条</span>
+          <button class="sm" id="review-prev">上一页</button>
+          <button class="sm" id="review-next">下一页</button>
         </div>
       </div>
     </section>
@@ -543,6 +690,21 @@
         <div class="head"><h2>词库分类</h2><div class="spacer"></div><span class="muted">勾选后立即生效</span></div>
         <div class="body"><div id="rules-cats" class="checklist"></div></div>
       </div>
+
+      <div class="panel">
+        <div class="head">
+          <h2>误判放行样本</h2><div class="spacer"></div>
+          <span class="muted" id="misjudge-count">0 条</span>
+          <button class="sm" id="btn-misjudge-refresh">刷新</button>
+          <button class="sm danger" id="btn-misjudge-clear">清空</button>
+        </div>
+        <div class="body">
+          <div class="muted" style="margin-bottom:10px">
+            在违规记录里点「误判」时，这条文本会被记下来，下次<b>原样出现</b>直接放行。只学模型判定的误判；规则词误判请直接删对应规则词。
+          </div>
+          <div id="misjudge-list"></div>
+        </div>
+      </div>
     </section>
 
     <section class="page" id="page-spam">
@@ -577,15 +739,57 @@
     <section class="page" id="page-members">
       <div class="panel">
         <div class="head">
-          <h2>成员查询</h2>
+          <h2>群成员管理</h2>
           <div class="spacer"></div>
-          <input id="member-group" placeholder="群 openid" style="width:300px" />
+          <input id="member-group" placeholder="群 openid" style="width:280px" />
           <button class="primary" id="btn-members">查询</button>
         </div>
-        <div class="body tight" id="members-table"><div class="empty">输入群 openid 后查询，或从「群管理」点进去</div></div>
+        <div class="body" id="member-summary">
+          <div class="empty">输入群 openid 后查询，或从「群管理」点「查看成员」</div>
+        </div>
       </div>
+
+      <div class="panel">
+        <div class="head">
+          <h2>成员</h2>
+          <div class="spacer"></div>
+          <input id="member-keyword" placeholder="搜昵称 / openid" style="width:170px" />
+          <button class="sm" id="btn-member-search">搜索</button>
+        </div>
+        <div class="body tight" id="members-table"><div class="empty">还没有查询</div></div>
+        <div class="body" id="members-pager" style="display:none">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="muted" id="members-info"></span>
+            <div class="spacer" style="flex:1"></div>
+            <button class="sm" id="members-prev">上一页</button>
+            <button class="sm" id="members-next">下一页</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="head"><h2>手动操作</h2><span class="muted" style="margin-left:8px">知道 openid 时直接填</span></div>
+        <div class="body">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <input id="manual-openid" placeholder="成员 openid（群里发「/我的id」可查）" style="flex:1;min-width:260px" />
+            <select id="manual-seconds" style="width:130px">
+              <option value="600">禁言 10 分钟</option>
+              <option value="3600">禁言 1 小时</option>
+              <option value="86400">禁言 1 天</option>
+              <option value="604800">禁言 7 天</option>
+            </select>
+            <button class="sm" data-manual="mute">禁言</button>
+            <button class="sm" data-manual="unmute">解除禁言</button>
+            <button class="sm danger" data-manual="kick">踢出</button>
+            <button class="sm" data-manual="grant">设为群管</button>
+          </div>
+        </div>
+      </div>
+
       <div class="muted" style="line-height:1.8">
-        官方「获取群成员列表」属于内邀能力，未开通会返回 11253。每次最多返回 30 人，第一页之后需要游标翻页。
+        官方「获取群成员列表」是应用级内邀权限（11253），个人开发者拿不到，所以这里的名单是
+        <b>插件自己攒的</b>：群成员每发一条消息就登记一次，昵称和 openid 都会更新。
+        从没说过话的人不会出现，这类只能手动填 openid 操作。
       </div>
     </section>
 
@@ -616,6 +820,10 @@
               <label class="switch"><input type="checkbox" id="moderation_use_llm" /><span class="slider"></span></label>
             </div>
             <div class="toggle-row">
+              <div class="text"><b>审核图片</b><span>先用视觉模型把图片转成文字描述，再走规则词/模型判定；每张图一次调用，默认关闭</span></div>
+              <label class="switch"><input type="checkbox" id="moderation_images" /><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
               <div class="text"><b>缓存群消息</b><span>撤回功能依赖缓存定位目标，关闭后撤回不可用</span></div>
               <label class="switch"><input type="checkbox" id="cache_messages" /><span class="slider"></span></label>
             </div>
@@ -626,6 +834,7 @@
                 <select id="moderation_action">
                   <option value="recall">撤回消息</option>
                   <option value="mute">禁言成员</option>
+                  <option value="recall_mute">撤回并禁言</option>
                   <option value="warn">仅提醒</option>
                 </select>
               </div>
@@ -645,6 +854,28 @@
               <label>审核使用的模型</label>
               <select id="llm_provider_id"><option value="">跟随会话默认</option></select>
             </div>
+            <div class="field">
+              <label>图片转述模型（审核图片时使用，必须支持图片输入）</label>
+              <select id="image_provider_id"><option value="">自动（用 AstrBot 的群聊图片转述模型）</option></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="head"><h2>放行复审</h2></div>
+          <div class="body">
+            <div class="toggle-row">
+              <div class="text"><b>记录放行内容</b><span>把审核通过的消息留一份，供「放行复审」页回看与标注；关闭后不再新增，已有数据仍可查看</span></div>
+              <label class="switch"><input type="checkbox" id="review_enabled" /><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="text"><b>留存原图</b><span>为放行消息里的图片也复制一份，占磁盘空间；默认只留文字与图片转述描述</span></div>
+              <label class="switch"><input type="checkbox" id="review_keep_image" /><span class="slider"></span></label>
+            </div>
+            <div class="row" style="margin-top:12px">
+              <div class="field"><label>保留条数（超出后自动删最旧）</label><input id="review_limit" type="number" min="100" max="20000" step="100" value="2000" /></div>
+            </div>
+            <div class="muted">按每天 300 条估算，2000 条约等于一周。复审只记录文字，不含被豁免的管理员命令。</div>
           </div>
         </div>
 
@@ -730,6 +961,16 @@
           </div>
         </div>
         <div class="panel">
+          <div class="head"><h2>群管理员（按群）</h2></div>
+          <div class="body">
+            <div class="field">
+              <label>JSON：{"群 openid": ["成员 openid", ...]}；也可以在群里发「/添加群管 @某人」</label>
+              <textarea id="group_admins" rows="6" placeholder='{"F1220577B78CD08334C7B1F5DA2959B5": ["EC58D87F598C8294A533B9D458DAAF33"]}'></textarea>
+            </div>
+            <div class="muted">这里的人只能管自己那个群；「管理员名单」对全部群生效。</div>
+          </div>
+        </div>
+        <div class="panel">
           <div class="head"><h2>审核白名单</h2></div>
           <div class="body">
             <div class="field"><label>每行一个 openid，这些人的消息不会被审核</label><textarea id="moderation_whitelist" rows="5"></textarea></div>
@@ -771,6 +1012,10 @@
               <div class="text"><b>入群申请</b><span>查看待审批的入群请求</span></div>
               <label class="switch"><input type="checkbox" id="join_request_enabled" /><span class="slider"></span></label>
             </div>
+            <div class="toggle-row">
+              <div class="text"><b>到期自动解禁</b><span>禁言时间到了自动解禁，重启后计划不丢</span></div>
+              <label class="switch"><input type="checkbox" id="auto_unmute" /><span class="slider"></span></label>
+            </div>
           </div>
         </div>
       </div>
@@ -807,13 +1052,42 @@
 
 <div class="toast" id="toast"></div>
 
+<div class="media-modal" id="media-modal">
+  <div class="media-box">
+    <img alt="审核原图" />
+    <div class="hint" id="media-hint">点击空白处关闭</div>
+    <div class="bar">
+      <button class="sm" id="media-save">保存图片</button>
+      <button class="sm" id="media-close">关闭</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   "use strict";
 
   var PLUGIN = "astrbot_plugin_qq_group_admin";
   var $ = function (id) { return document.getElementById(id); };
-  var state = { page: "overview", recordsPage: 1, recordsKind: "", recordsPages: 1, rulesPage: 1, rulesPages: 1 };
+  var state = {
+    page: "overview",
+    recordsPage: 1,
+    recordsKind: "",
+    recordsPages: 1,
+    reviewPage: 1,
+    reviewPages: 1,
+    reviewQ: "",
+    reviewGroup: "",
+    reviewFilter: "pending",
+    reviewSource: "",
+    reviewRisk: false,
+    rulesPage: 1,
+    rulesPages: 1,
+    memberGroup: "",
+    memberPage: 1,
+    memberSize: 50,
+    memberKeyword: "",
+  };
 
   function getBridge() {
     return window.AstrBotPluginView || window.AstrBotPluginPage || null;
@@ -833,7 +1107,8 @@
     overview: ["总览", "实时防护数据与今日拦截情况"],
     groups: ["群管理", "机器人能看到的群与拦截统计"],
     records: ["违规记录", "按类型筛选、标记误判或删除"],
-    members: ["成员查询", "按群 openid 查看成员列表"],
+    review: ["放行复审", "审核通过的消息留档，人工回看有没有漏判"],
+    members: ["群成员管理", "查看成员并直接禁言 / 解禁 / 踢人"],
     rules: ["规则中心", "命中即处置的关键词库"],
     spam: ["刷屏监控", "消息频率与阈值设置"],
     settings: ["设置", "凭据、审核、名单与高级选项"],
@@ -884,8 +1159,8 @@
   }
 
   function esc(value) {
-    return String(value == null ? "" : value).replace(/[&<>"]/g, function (ch) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch];
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
     });
   }
 
@@ -916,6 +1191,7 @@
     if (name === "overview") loadOverview();
     if (name === "groups") loadGroups();
     if (name === "records") loadRecords();
+    if (name === "review") loadReview();
     if (name === "members") loadMembersPage();
     if (name === "rules") loadRules();
     if (name === "spam") loadSpam();
@@ -975,6 +1251,129 @@
     }
   }
 
+  function mediaUrl(name) {
+    if (!name) return "";
+    return location.origin + "/api/plug/" + PLUGIN + "/media?f=" + encodeURIComponent(name);
+  }
+
+  function brief(text, limit) {
+    var value = String(text == null ? "" : text);
+    if (!limit || value.length <= limit) return value;
+    return value.slice(0, limit) + "…";
+  }
+
+  function evidenceHtml(r) {
+    if (!r.image) {
+      return r.has_image
+        ? '<div class="evi"><span class="muted" style="font-size:12px">原图未留存（生成这条记录时还没开启留存，可在设置里打开）</span></div>'
+        : "";
+    }
+    var name = esc(r.image);
+    return '<div class="evi">' +
+      '<img class="thumb" data-media="' + name + '" data-open-media="' + name + '" alt="加载中…" />' +
+      '<button class="sm" data-open-media="' + name + '">查看原图</button>' +
+      '<button class="sm" data-save-media="' + name + '">保存图片</button></div>';
+  }
+
+  var _mediaCache = {};
+  var _mediaCacheCount = 0;
+
+  async function fetchMedia(name) {
+    if (!name) throw new Error("没有图片");
+    if (_mediaCache[name]) return _mediaCache[name];
+    var data = unwrap(await callApi("media_data", "GET", { f: name }));
+    if (!data || !data.data) throw new Error("图片数据为空");
+    if (_mediaCacheCount > 100) {
+      _mediaCache = {};
+      _mediaCacheCount = 0;
+    }
+    _mediaCache[name] = data;
+    _mediaCacheCount += 1;
+    return data;
+  }
+
+  function hydrateEvidence(root) {
+    (root || document).querySelectorAll("img[data-media]").forEach(function (img) {
+      if (img.dataset.loaded) return;
+      img.dataset.loaded = "1";
+      fetchMedia(img.dataset.media).then(function (d) {
+        img.src = "data:" + d.mime + ";base64," + d.data;
+        img.alt = "审核原图";
+      }).catch(function () {
+        img.alt = "加载失败";
+      });
+    });
+  }
+
+  function openMedia(name) {
+    fetchMedia(name).then(function (d) {
+      var modal = $("media-modal");
+      if (!modal) return;
+      modal.querySelector("img").src = "data:" + d.mime + ";base64," + d.data;
+      modal.dataset.name = d.name || name;
+      $("media-hint").textContent = (d.name || name) + " · " + Math.round((d.size || 0) / 1024) + " KB";
+      modal.classList.add("show");
+    }).catch(function (err) {
+      toast("图片加载失败：" + err.message);
+    });
+  }
+
+  function saveMedia(name) {
+    fetchMedia(name).then(function (d) {
+      var a = document.createElement("a");
+      a.href = "data:" + d.mime + ";base64," + d.data;
+      a.download = d.name || name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast("已保存 " + (d.name || name));
+    }).catch(function (err) {
+      toast("保存失败：" + err.message);
+    });
+  }
+
+  function initMediaViewer() {
+    var modal = $("media-modal");
+    if (!modal) return;
+    modal.addEventListener("click", function (ev) {
+      if (ev.target === modal) modal.classList.remove("show");
+    });
+    $("media-close").addEventListener("click", function () {
+      modal.classList.remove("show");
+    });
+    $("media-save").addEventListener("click", function () {
+      if (modal.dataset.name) saveMedia(modal.dataset.name);
+    });
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape") modal.classList.remove("show");
+    });
+    document.addEventListener("click", function (ev) {
+      var target = ev.target;
+      if (!target || !target.closest) return;
+      var openBtn = target.closest("[data-open-media]");
+      if (openBtn) {
+        openMedia(openBtn.dataset.openMedia);
+        return;
+      }
+      var saveBtn = target.closest("[data-save-media]");
+      if (saveBtn) saveMedia(saveBtn.dataset.saveMedia);
+    });
+  }
+
+  function bindCopy(root) {
+    (root || document).querySelectorAll("[data-copy]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var text = btn.dataset.copy || "";
+        var done = function () { toast("链接已复制，浏览器打开即可看图"); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(function () { window.prompt("复制这个链接", text); });
+        } else {
+          window.prompt("复制这个链接", text);
+        }
+      });
+    });
+  }
+
   function renderRecent(items) {
     var box = $("ov-recent");
     if (!items.length) {
@@ -984,12 +1383,50 @@
     var html = "<table><thead><tr><th>时间</th><th>用户</th><th>类型</th><th>原因</th><th>处置</th></tr></thead><tbody>";
     items.forEach(function (r) {
       html += "<tr><td>" + esc(r.time) + "</td><td>" + esc(r.name) + "</td><td><span class='tag blue'>" +
-        esc(r.kind) + "</span></td><td>" + esc(r.reason) + "</td><td>" + esc(r.action) + "</td></tr>";
+        esc(r.kind) + "</span></td><td>" + esc(r.reason) +
+        (r.text ? "<div class='quote' title='" + esc(r.text) + "'>“" + esc(brief(r.text, 60)) + "”</div>" : "") +
+        evidenceHtml(r) +
+        "</td><td>" + esc(r.action) + "</td></tr>";
     });
     box.innerHTML = html + "</tbody></table>";
+    bindCopy(box);
+    hydrateEvidence(box);
   }
 
   /* ---------------- 群管理 ---------------- */
+
+  $("btn-groups-refresh").addEventListener("click", function () {
+    loadGroups();
+  });
+
+  $("btn-groups-sync").addEventListener("click", async function () {
+    this.disabled = true;
+    try {
+      var data = unwrap(await callApi("groups/sync", "POST", {}));
+      toast(data.message || "已同步");
+      loadGroups();
+    } catch (err) {
+      toast("同步失败：" + err.message);
+    } finally {
+      this.disabled = false;
+    }
+  });
+
+  $("btn-group-add").addEventListener("click", async function () {
+    var gid = ($("group-add-input").value || "").trim();
+    if (!gid) {
+      toast("请先填写群 openid");
+      return;
+    }
+    try {
+      var info = unwrap(await callApi("groups/add", "POST", { group_id: gid }));
+      toast(info && info.name ? "已添加：" + info.name : "已添加这个群");
+      $("group-add-input").value = "";
+      loadGroups();
+    } catch (err) {
+      toast("添加失败：" + err.message);
+    }
+  });
 
   async function loadGroups() {
     try {
@@ -997,16 +1434,21 @@
       var rows = data.groups || [];
       $("groups-total").textContent = (data.total || 0) + " 个群";
       if (!rows.length) {
-        $("groups-grid").innerHTML = '<div class="empty" style="grid-column:1/-1">还没有收到过群消息</div>';
+        $("groups-grid").innerHTML = '<div class="empty" style="grid-column:1/-1">还没有记录到群。在群里随便发一句话，或在上方手动登记群 openid。</div>';
         return;
       }
       $("groups-grid").innerHTML = rows.map(function (g) {
-        var name = g.name || "未命名群";
+        var name = g.name || "未命名群（点同步取名字）";
+        var metrics = [];
+        metrics.push("名册 " + (g.roster || 0) + " 人");
+        if (g.member_count) metrics.push("群人数 " + g.member_count);
+        metrics.push("拦截 " + g.blocked + " 条");
+        metrics.push(g.last_seen);
         return '<div class="group-card">' +
           '<div class="top"><div class="avatar">' + esc(name.slice(0, 1)) + '</div>' +
           '<div style="min-width:0"><div class="name">' + esc(name) + '</div>' +
           '<div class="id">' + esc(String(g.group_id).slice(0, 14)) + '…</div></div></div>' +
-          '<div class="metrics"><span>拦截 ' + g.blocked + ' 条</span><span>' + esc(g.last_seen) + '</span></div>' +
+          '<div class="metrics">' + metrics.map(function (m) { return "<span>" + esc(m) + "</span>"; }).join("") + '</div>' +
           '<button class="sm" data-group="' + esc(g.group_id) + '" data-open-members="1">查看成员</button>' +
           "</div>";
       }).join("");
@@ -1043,13 +1485,17 @@
         var html = "<table><thead><tr><th>时间</th><th>用户</th><th>类型</th><th>原因</th><th>处置</th><th>状态</th><th>操作</th></tr></thead><tbody>";
         items.forEach(function (r) {
           html += "<tr><td>" + esc(r.time) + "</td><td>" + esc(r.name) + "</td>" +
-            "<td><span class='tag blue'>" + esc(r.kind) + "</span></td><td>" + esc(r.reason) + "</td>" +
+            "<td><span class='tag blue'>" + esc(r.kind) + "</span></td><td>" + esc(r.reason) +
+            (r.text ? "<div class='quote' title='" + esc(r.text) + "'>“" + esc(brief(r.text, 80)) + "”</div>" : "") +
+            evidenceHtml(r) + "</td>" +
             "<td>" + esc(r.action) + "</td><td>" + statusTag(r.status) + "</td>" +
             "<td><button class='sm' data-act='confirm' data-id='" + r.id + "'>确认</button> " +
             "<button class='sm' data-act='misjudge' data-id='" + r.id + "'>误判</button> " +
             "<button class='sm danger' data-act='delete' data-id='" + r.id + "'>删除</button></td></tr>";
         });
         box.innerHTML = html + "</tbody></table>";
+        bindCopy(box);
+        hydrateEvidence(box);
       }
 
       var total = data.total || 0;
@@ -1063,36 +1509,436 @@
     }
   }
 
-  /* ---------------- 成员查询 ---------------- */
+  /* ---------------- 放行复审 ---------------- */
 
-  async function loadMembersPage() {
-    var group = ($("member-group").value || "").trim();
-    if (group) await queryMembers(group);
+  var REVIEW_TAGS = {
+    pending: ["待复审", "warn"],
+    clean: ["正常", "ok"],
+    violation: ["漏判", "bad"],
+    ignored: ["已忽略", ""],
+  };
+
+  function reviewTag(value) {
+    var info = REVIEW_TAGS[value] || [value || "—", ""];
+    return "<span class='tag " + info[1] + "'>" + esc(info[0]) + "</span>";
   }
 
-  async function queryMembers(group) {
+  function fillReviewSelect(el, rows, allLabel, valueOf, labelOf) {
+    if (!el) return;
+    var current = el.value;
+    var html = "<option value=''>" + allLabel + "</option>";
+    rows.forEach(function (row) {
+      html += "<option value='" + esc(valueOf(row)) + "'>" + esc(labelOf(row)) + "</option>";
+    });
+    el.innerHTML = html;
+    el.value = current;
+    if (el.value !== current) el.value = "";
+  }
+
+  async function loadReview() {
+    var params = { page: state.reviewPage, size: 20 };
+    if (state.reviewQ) params.q = state.reviewQ;
+    if (state.reviewGroup) params.group = state.reviewGroup;
+    if (state.reviewFilter) params.review = state.reviewFilter;
+    if (state.reviewSource) params.source = state.reviewSource;
+    if (state.reviewRisk) params.risk = 1;
+
+    try {
+      var data = unwrap(await callApi("review", "GET", params));
+
+      fillReviewSelect(
+        $("review-group"), data.groups || [], "全部群",
+        function (g) { return g.group_id; },
+        function (g) {
+          var name = g.group_name || String(g.group_id || "").slice(0, 8) + "…";
+          return name + "（" + (g.n || 0) + "）";
+        }
+      );
+      fillReviewSelect(
+        $("review-source"), data.sources || [], "全部来源",
+        function (s) { return s.key; },
+        function (s) { return s.label; }
+      );
+
+      renderReviewTable(data.items || []);
+
+      var total = data.total || 0;
+      var size = data.size || 20;
+      var pages = Math.max(1, Math.ceil(total / size));
+      state.reviewPages = pages;
+      $("review-info").textContent = "共 " + total + " 条 · 第 " + state.reviewPage + "/" + pages + " 页";
+      $("review-prev").disabled = state.reviewPage <= 1;
+      $("review-next").disabled = state.reviewPage >= pages;
+
+      var s = data.stats || {};
+      $("review-summary").textContent =
+        "待复审 " + (s.pending || 0) + " · 高风险 " + (s.risky_pending || 0) +
+        " · 漏判 " + (s.violation || 0) + " · 正常 " + (s.clean || 0);
+    } catch (err) {
+      toast("读取复审列表失败：" + err.message);
+      $("review-table").innerHTML = '<div class="empty">' + esc(err.message) + "</div>";
+    }
+  }
+
+  function renderReviewTable(items) {
+    var box = $("review-table");
+    if (!items.length) {
+      box.innerHTML = '<div class="empty">没有符合条件的放行记录。刚开启复审的话，等群里来几条新消息再看。</div>';
+      return;
+    }
+
+    var html = "<table><thead><tr>" +
+      "<th style='width:32px'><input type='checkbox' id='review-all' style='width:auto' /></th>" +
+      "<th style='width:108px'>时间</th><th style='width:132px'>群</th><th style='width:96px'>成员</th>" +
+      "<th>内容</th><th style='width:110px'>放行来源</th><th style='width:96px'>复审</th>" +
+      "<th style='width:206px'>操作</th></tr></thead><tbody>";
+
+    items.forEach(function (r) {
+      var gname = r.group_name || (String(r.group_id || "").slice(0, 8) + "…");
+      var who = r.user_name || (String(r.user_id || "").slice(0, 8) + "…");
+      html += "<tr>";
+      html += "<td><input type='checkbox' class='rv-check' value='" + r.id + "' style='width:auto' /></td>";
+      html += "<td class='mono' style='font-size:12px'>" + esc(r.clock) + "</td>";
+      html += "<td title='" + esc(r.group_id) + "'>" + esc(gname) + "</td>";
+      html += "<td>" + esc(who) + "</td>";
+      html += "<td>";
+      if (r.has_image) html += "<span class='tag blue'>图片</span> ";
+      if (r.text) {
+        html += "<div class='quote' style='margin-top:0' title='" + esc(r.text) + "'>“" +
+          esc(brief(r.text, 90)) + "”</div>";
+      } else {
+        html += "<span class='muted'>—</span>";
+      }
+      html += evidenceHtml(r);
+      if (r.note) {
+        html += "<div class='muted' style='font-size:11.5px;margin-top:4px'>备注：" + esc(r.note) + "</div>";
+      }
+      html += "</td>";
+      html += "<td><span class='tag'>" + esc(r.source_text || r.source) + "</span></td>";
+      html += "<td>" + reviewTag(r.review) + "</td>";
+      html += "<td>";
+      if (r.review !== "clean") html += "<button class='sm' data-rv='clean' data-id='" + r.id + "'>正常</button> ";
+      if (r.review !== "violation") html += "<button class='sm danger' data-rv='violation' data-id='" + r.id + "'>漏判</button> ";
+      if (r.review !== "ignored") html += "<button class='sm' data-rv='ignored' data-id='" + r.id + "'>忽略</button> ";
+      if (r.review !== "pending") html += "<button class='sm' data-rv='pending' data-id='" + r.id + "'>撤销</button>";
+      if (r.review === "violation") html += " <button class='sm' data-rv-rule='1'>加规则</button>";
+      html += "</td></tr>";
+    });
+
+    box.innerHTML = html + "</tbody></table>";
+    bindCopy(box);
+    hydrateEvidence(box);
+  }
+
+  async function markReview(ids, action, opts) {
+    opts = opts || {};
+    if (!ids || !ids.length) {
+      toast("先勾选要处理的记录");
+      return;
+    }
+    try {
+      var data = unwrap(await callApi("review/action", "POST", {
+        ids: ids,
+        action: action,
+        note: opts.note,
+        recall: !!opts.recall,
+      }));
+      var msg = "已更新 " + (data.updated || 0) + " 条";
+      if (data.recalled) msg += "，补撤回 " + data.recalled + " 条";
+      toast(msg);
+      loadReview();
+    } catch (err) {
+      toast("标注失败：" + err.message);
+    }
+  }
+
+  function selectReviewRow(id, action) {
+    if (action === "violation") {
+      var note = window.prompt("这条为什么算漏判？（可留空，会记在备注里）", "");
+      if (note === null) return;
+      var recall = window.confirm(
+        "同时尝试撤回这条消息？\n官方接口只支持撤回 2 分钟内的消息，超时会失败，但标注照常记录。"
+      );
+      markReview([id], "violation", { note: note, recall: recall });
+      return;
+    }
+    markReview([id], action, {});
+  }
+
+  async function addReviewRule() {
+    var word = window.prompt("要把哪个词加入规则中心？（命中即处置，最多 30 字）", "");
+    if (!word || !word.trim()) return;
+    try {
+      unwrap(await callApi("rules", "POST", { action: "add", word: word.trim() }));
+      toast("已加入规则词：" + word.trim());
+    } catch (err) {
+      toast("加入失败：" + err.message);
+    }
+  }
+
+  function initReviewPage() {
+    var table = $("review-table");
+    if (!table) return;
+
+    table.addEventListener("change", function (ev) {
+      if (!ev.target || ev.target.id !== "review-all") return;
+      var checked = ev.target.checked;
+      table.querySelectorAll(".rv-check").forEach(function (el) { el.checked = checked; });
+    });
+
+    table.addEventListener("click", function (ev) {
+      var btn = ev.target.closest ? ev.target.closest("[data-rv]") : null;
+      if (btn) {
+        selectReviewRow(Number(btn.dataset.id), btn.dataset.rv);
+        return;
+      }
+      var ruleBtn = ev.target.closest ? ev.target.closest("[data-rv-rule]") : null;
+      if (ruleBtn) addReviewRule();
+    });
+
+    $("btn-review-refresh").addEventListener("click", function () { loadReview(); });
+
+    $("btn-review-search").addEventListener("click", function () {
+      state.reviewQ = ($("review-q").value || "").trim();
+      state.reviewGroup = $("review-group").value || "";
+      state.reviewFilter = $("review-state").value || "";
+      state.reviewSource = $("review-source").value || "";
+      state.reviewRisk = $("review-risk").checked;
+      state.reviewPage = 1;
+      loadReview();
+    });
+
+    $("review-q").addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter") $("btn-review-search").click();
+    });
+
+    $("review-prev").addEventListener("click", function () {
+      if (state.reviewPage > 1) { state.reviewPage -= 1; loadReview(); }
+    });
+
+    $("review-next").addEventListener("click", function () {
+      if (state.reviewPage < state.reviewPages) { state.reviewPage += 1; loadReview(); }
+    });
+
+    $("btn-review-clean").addEventListener("click", function () {
+      var ids = selectedReviewIds();
+      if (!ids.length) { toast("先勾选要处理的记录"); return; }
+      if (!window.confirm("把选中的 " + ids.length + " 条标记为「正常」？")) return;
+      markReview(ids, "clean", {});
+    });
+
+    $("btn-review-ignore").addEventListener("click", function () {
+      var ids = selectedReviewIds();
+      if (!ids.length) { toast("先勾选要处理的记录"); return; }
+      markReview(ids, "ignored", {});
+    });
+
+    $("btn-review-clear").addEventListener("click", async function () {
+      if (!window.confirm("确定清空全部放行记录？此操作不可恢复，违规记录不受影响。")) return;
+      try {
+        var data = unwrap(await callApi("review/action", "POST", { action: "clear_all" }));
+        toast("已清空 " + (data.cleared || 0) + " 条放行记录");
+        state.reviewPage = 1;
+        loadReview();
+      } catch (err) {
+        toast("清空失败：" + err.message);
+      }
+    });
+  }
+
+  function selectedReviewIds() {
+    var ids = [];
+    document.querySelectorAll("#review-table .rv-check:checked").forEach(function (el) {
+      var value = Number(el.value);
+      if (value) ids.push(value);
+    });
+    return ids;
+  }
+
+  /* ---------------- 群成员管理 ---------------- */
+
+  var MUTE_OPTIONS = [
+    { value: 600, label: "10 分钟" },
+    { value: 3600, label: "1 小时" },
+    { value: 86400, label: "1 天" },
+    { value: 604800, label: "7 天" },
+  ];
+
+  function memberGroup() {
+    return ($("member-group").value || "").trim();
+  }
+
+  async function loadMembersPage() {
+    var group = memberGroup();
+    if (group) await queryMembers(group, 1);
+  }
+
+  async function queryMembers(group, page) {
+    state.memberGroup = group;
+    state.memberPage = page || 1;
     var box = $("members-table");
     box.innerHTML = '<div class="empty">查询中…</div>';
     try {
-      var data = unwrap(await callApi("members", "GET", { group: group }));
-      var rows = data.members || [];
-      if (!rows.length) {
-        box.innerHTML = '<div class="empty">没有拿到成员（可能需要平台开通「群成员列表」权限）</div>';
-        return;
-      }
-      var roles = { owner: "群主", admin: "管理员", member: "成员" };
-      var html = "<table><thead><tr><th>昵称</th><th>角色</th><th>openid</th><th>入群时间</th></tr></thead><tbody>";
-      rows.forEach(function (m) {
-        html += "<tr><td>" + esc(m.username || "-") + "</td><td>" +
-          esc(roles[m.member_role] || "成员") + "</td>" +
-          "<td style='font-family:ui-monospace,monospace'>" +
-          esc(String(m.member_openid || "").slice(0, 14)) + "…</td><td>" +
-          esc(m.joined_at || "-") + "</td></tr>";
-      });
-      box.innerHTML = html + "</tbody></table>";
+      var data = unwrap(
+        await callApi("members", "GET", {
+          group: group,
+          keyword: state.memberKeyword || "",
+          page: state.memberPage,
+          size: state.memberSize,
+        })
+      );
+      renderMemberSummary(data);
+      renderMemberTable(data);
     } catch (err) {
       box.innerHTML = '<div class="empty">查询失败：' + esc(err.message) + "</div>";
+      $("member-summary").innerHTML = '<div class="empty">查询失败：' + esc(err.message) + "</div>";
     }
+  }
+
+  function renderMemberSummary(data) {
+    var box = $("member-summary");
+    var role = data.bot_role || "";
+    var isAdmin = role === "admin" || role === "owner";
+    var roleText = role === "owner" ? "群主" : role === "admin" ? "管理员" : role ? "普通成员" : "未知";
+
+    var html =
+      '<div class="summary-grid">' +
+      '<div class="stat"><span>群名</span><b>' + esc(data.group_name || "未取到") + "</b></div>" +
+      '<div class="stat"><span>群人数</span><b>' + (data.member_count || "-") + "</b></div>" +
+      '<div class="stat"><span>已记录成员</span><b>' + (data.roster_total || 0) + "</b></div>" +
+      '<div class="stat"><span>禁言中</span><b>' + (data.muted_count || 0) + "</b></div>" +
+      '<div class="stat"><span>机器人身份</span><b>' + esc(roleText) + "</b></div>" +
+      "</div>";
+
+    if (data.api_ready === false) {
+      html +=
+        '<div class="notice warn"><div class="n-h"><span class="tag warn">未配置</span>缺少凭据</div>' +
+        '<div class="n-b">先在「设置 → 核心」里填 AppID / AppSecret，否则禁言、踢人都调不动接口。</div></div>';
+    } else if (!isAdmin) {
+      html +=
+        '<div class="notice warn"><div class="n-h"><span class="tag warn">需要处理</span>机器人是' +
+        esc(roleText) + "</div>" +
+        '<div class="n-b">去群设置把机器人设为<b>群管理员</b>，否则禁言 / 踢人会提示「没有操作权限」。</div></div>';
+    } else {
+      html +=
+        '<div class="notice ok"><div class="n-h"><span class="tag ok">可操作</span>机器人是本群' +
+        esc(roleText) + "</div>" +
+        '<div class="n-b">可以直接在下面的表格里禁言 / 解禁 / 踢人。'
+        + (data.api_available ? "当前应用有成员列表权限，名单是官方数据。" : "官方不给成员列表，这里的名单是插件自己攒的。")
+        + "</div></div>";
+    }
+
+    box.innerHTML = html;
+  }
+
+  function renderMemberTable(data) {
+    var box = $("members-table");
+    var rows = data.members || [];
+    var total = data.total || 0;
+    var size = data.size || 50;
+    var pages = Math.max(1, Math.ceil(total / size));
+
+    $("members-pager").style.display = total ? "" : "none";
+    $("members-info").textContent = "共 " + total + " 人 · 第 " + (data.page || 1) + "/" + pages + " 页";
+    $("members-prev").disabled = (data.page || 1) <= 1;
+    $("members-next").disabled = (data.page || 1) >= pages;
+
+    if (!rows.length) {
+      box.innerHTML = data.keyword
+        ? '<div class="empty">没有匹配「' + esc(data.keyword) + '」的成员。</div>'
+        : '<div class="empty" style="line-height:2">这个群还没记录到成员。<br />' +
+          "群成员随便发一句话就会自动登记（机器人要在群里，开放平台需开启「接收所有消息」）。<br />" +
+          "从没说过话的人查不到，可以在下面「手动操作」里直接填 openid。</div>";
+      return;
+    }
+
+    var html =
+      "<table><thead><tr><th>昵称</th><th>openid</th><th>最近发言</th>" +
+      "<th>身份</th><th>状态</th><th style='min-width:300px'>操作</th></tr></thead><tbody>";
+
+    rows.forEach(function (m) {
+      var tags = "";
+      if (m.is_global_admin) tags += '<span class="tag blue">全局管理员</span> ';
+      if (m.is_group_admin) tags += '<span class="tag ok">本群群管</span>';
+      if (!tags) tags = '<span class="tag">成员</span>';
+
+      var muted = !!m.muted_until;
+      var status = muted
+        ? '<span class="tag bad" title="' + esc(m.muted_until) + '">禁言中</span>'
+        : '<span class="muted">正常</span>';
+
+      var options = MUTE_OPTIONS.map(function (o) {
+        return '<option value="' + o.value + '">' + o.label + "</option>";
+      }).join("");
+
+      html +=
+        '<tr data-openid="' + esc(m.openid) + '" data-name="' + esc(m.name || "") + '">' +
+        "<td>" + esc(m.name || "-") + "</td>" +
+        '<td class="mono" title="' + esc(m.openid) + '">' + esc(String(m.openid).slice(0, 10)) + "…</td>" +
+        "<td>" + esc(m.last_seen || "-") + "</td>" +
+        "<td>" + tags + "</td>" +
+        "<td>" + status + "</td>" +
+        '<td><div class="row-actions">' +
+        '<select class="mini" data-seconds>' + options + "</select>" +
+        '<button class="sm" data-act="mute">禁言</button>' +
+        (muted ? '<button class="sm" data-act="unmute">解禁</button>' : "") +
+        '<button class="sm danger" data-act="kick">踢出</button>' +
+        (m.is_group_admin
+          ? '<button class="sm ghost" data-act="revoke">移出群管</button>'
+          : '<button class="sm ghost" data-act="grant">设群管</button>') +
+        "</div></td></tr>";
+    });
+
+    box.innerHTML = html + "</tbody></table>";
+  }
+
+  async function memberAction(openid, name, action, seconds, group) {
+    var target = group || state.memberGroup;
+    if (!target) return toast("先查询一个群");
+    if (!openid) return toast("缺少 openid");
+
+    var label = name || openid.slice(0, 8);
+    if (action === "kick" && !window.confirm("确认把「" + label + "」踢出群？")) return;
+
+    try {
+      var data = unwrap(
+        await callApi("members/action", "POST", {
+          group: target,
+          openid: openid,
+          name: name || "",
+          action: action,
+          seconds: seconds,
+        })
+      );
+      toast((data && data.message) || "操作成功");
+      await queryMembers(target, state.memberPage);
+    } catch (err) {
+      toast("操作失败：" + err.message);
+    }
+  }
+
+  function initMemberActions() {
+    var box = $("members-table");
+
+    // 表格每次查询都重绘，用事件委托，避免重复绑定
+    box.addEventListener("click", function (event) {
+      var btn = event.target.closest("button[data-act]");
+      if (!btn) return;
+      var tr = btn.closest("tr");
+      if (!tr) return;
+      var select = tr.querySelector("select[data-seconds]");
+      var seconds = select ? Number(select.value) : 600;
+      memberAction(tr.dataset.openid, tr.dataset.name, btn.dataset.act, seconds);
+    });
+
+    document.querySelectorAll("button[data-manual]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var openid = ($("manual-openid").value || "").trim();
+        if (!openid) return toast("先填成员 openid");
+        var seconds = Number($("manual-seconds").value || 600);
+        memberAction(openid, "", btn.dataset.manual, seconds);
+      });
+    });
   }
 
   /* ---------------- 平台与模型 ---------------- */
@@ -1108,14 +1954,22 @@
           }).join("")
         : '<div class="muted">没有找到平台实例</div>';
 
+      var options = (data.providers || []).map(function (p) {
+        var label = p.model ? p.model + " · " + p.id : p.id;
+        return '<option value="' + esc(p.id) + '">' + esc(label) + "</option>";
+      }).join("");
+
       var sel = $("llm_provider_id");
       var current = sel.value;
-      sel.innerHTML = '<option value="">跟随会话默认</option>' +
-        (data.providers || []).map(function (p) {
-          var label = p.model ? p.model + " · " + p.id : p.id;
-          return '<option value="' + esc(p.id) + '">' + esc(label) + "</option>";
-        }).join("");
+      sel.innerHTML = '<option value="">跟随会话默认</option>' + options;
       sel.value = current;
+
+      var imgSel = $("image_provider_id");
+      if (imgSel) {
+        var imgCurrent = imgSel.value;
+        imgSel.innerHTML = '<option value="">自动（用 AstrBot 的群聊图片转述模型）</option>' + options;
+        imgSel.value = imgCurrent;
+      }
     } catch (err) {
       $("platform-list").innerHTML = '<div class="muted">读取平台列表失败</div>';
     }
@@ -1123,7 +1977,32 @@
 
   /* ---------------- 规则中心 ---------------- */
 
+  var _misjudgeItems = [];
+
+  async function loadMisjudgeSamples() {
+    var box = $("misjudge-list");
+    if (!box) return;
+    try {
+      var data = unwrap(await callApi("misjudge", "GET"));
+      _misjudgeItems = data.items || [];
+      $("misjudge-count").textContent = _misjudgeItems.length + " 条";
+      if (!_misjudgeItems.length) {
+        box.innerHTML = '<div class="empty">还没有误判样本。在「违规记录」里点「误判」就会记下来。</div>';
+        return;
+      }
+      var html = "<table><thead><tr><th>文本</th><th style='width:76px'>操作</th></tr></thead><tbody>";
+      _misjudgeItems.forEach(function (text, index) {
+        html += "<tr><td class='mono' style='font-size:12.5px'>" + esc(brief(text, 140)) + "</td>" +
+          "<td><button class='sm danger' data-misjudge-del='" + index + "'>删除</button></td></tr>";
+      });
+      box.innerHTML = html + "</tbody></table>";
+    } catch (err) {
+      box.innerHTML = '<div class="empty">' + esc(err.message) + "</div>";
+    }
+  }
+
   async function loadRules() {
+    loadMisjudgeSamples();
     try {
       var params = { page: state.rulesPage, size: 50 };
       var query = ($("rules-q").value || "").trim();
@@ -1280,10 +2159,15 @@
     $("app_secret").value = config.app_secret || "";
     $("app_secret").type = "password";
     $("admin_openids").value = (config.admin_openids || []).join("\n");
+    $("group_admins").value = JSON.stringify(config.group_admins || {}, null, 2);
     $("moderation_enabled").checked = !!config.moderation_enabled;
     $("moderation_action").value = config.moderation_action || "recall";
     $("moderation_mute_seconds").value = config.moderation_mute_seconds || 600;
     $("moderation_use_llm").checked = !!config.moderation_use_llm;
+    $("moderation_images").checked = !!config.moderation_images;
+    $("review_enabled").checked = config.review_enabled !== false;
+    $("review_keep_image").checked = !!config.review_keep_image;
+    $("review_limit").value = config.review_limit || 2000;
     $("moderation_prompt").value = config.moderation_prompt || "";
     $("moderation_whitelist").value = (config.moderation_whitelist || []).join("\n");
     $("cache_messages").checked = !!config.cache_messages;
@@ -1293,6 +2177,7 @@
     $("verify_ssl").checked = !!config.verify_ssl;
 
     $("llm_provider_id").value = config.llm_provider_id || "";
+    $("image_provider_id").value = config.image_provider_id || "";
     var selected = config.platform_ids || [];
     document.querySelectorAll("#platform-list input[type=checkbox]").forEach(function (box) {
       box.checked = selected.indexOf(box.value) >= 0;
@@ -1310,6 +2195,7 @@
     $("whole_ban_enabled").checked = config.whole_ban_enabled !== false;
     $("member_query_enabled").checked = config.member_query_enabled !== false;
     $("join_request_enabled").checked = config.join_request_enabled !== false;
+    $("auto_unmute").checked = config.auto_unmute !== false;
 
     $("max_records").value = config.max_records || 500;
     $("command_rate_limit").value = config.command_rate_limit || 0;
@@ -1329,7 +2215,18 @@
   }
 
   function collectSettings() {
+    var groupAdmins = {};
+    var rawGroupAdmins = ($("group_admins").value || "").trim();
+    if (rawGroupAdmins) {
+      try {
+        groupAdmins = JSON.parse(rawGroupAdmins);
+      } catch (err) {
+        toast("群管理员表不是合法 JSON，先改好再保存");
+        throw new Error("invalid group_admins");
+      }
+    }
     return {
+      group_admins: groupAdmins,
       enable: $("enable").checked,
       app_id: $("app_id").value.trim(),
       app_secret: $("app_secret").value.trim(),
@@ -1338,6 +2235,11 @@
       moderation_action: $("moderation_action").value,
       moderation_mute_seconds: Number($("moderation_mute_seconds").value || 600),
       moderation_use_llm: $("moderation_use_llm").checked,
+      moderation_images: $("moderation_images").checked,
+      image_provider_id: $("image_provider_id").value,
+      review_enabled: $("review_enabled").checked,
+      review_keep_image: $("review_keep_image").checked,
+      review_limit: parseInt($("review_limit").value, 10) || 2000,
       moderation_prompt: $("moderation_prompt").value.trim(),
       moderation_whitelist: lines($("moderation_whitelist").value),
       cache_messages: $("cache_messages").checked,
@@ -1358,6 +2260,7 @@
       whole_ban_enabled: $("whole_ban_enabled").checked,
       member_query_enabled: $("member_query_enabled").checked,
       join_request_enabled: $("join_request_enabled").checked,
+      auto_unmute: $("auto_unmute").checked,
       llm_provider_id: $("llm_provider_id").value,
       platform_ids: Array.from(
         document.querySelectorAll("#platform-list input[type=checkbox]:checked")
@@ -1414,11 +2317,45 @@
     var btn = event.target.closest("button[data-act]");
     if (!btn) return;
     try {
-      await callApi("records/action", "POST", { id: btn.dataset.id, action: btn.dataset.act });
-      toast("已更新");
+      var res = unwrap(await callApi("records/action", "POST", { id: btn.dataset.id, action: btn.dataset.act }));
+      if (btn.dataset.act === "misjudge") {
+        toast(res.learned ? "已记住：下次原样出现会直接放行" : "已标记误判；规则词导致的误判请去规则中心删词");
+      } else {
+        toast("已更新");
+      }
       loadRecords();
     } catch (err) {
       toast("操作失败：" + err.message);
+    }
+  });
+
+  document.addEventListener("click", async function (event) {
+    var btn = event.target.closest("button[data-misjudge-del]");
+    if (!btn) return;
+    var index = Number(btn.dataset.misjudgeDel);
+    var text = _misjudgeItems[index];
+    if (!text) return;
+    try {
+      await callApi("misjudge", "POST", { action: "delete", text: text });
+      toast("已删除该样本");
+      loadMisjudgeSamples();
+    } catch (err) {
+      toast("删除失败：" + err.message);
+    }
+  });
+
+  $("btn-misjudge-refresh").addEventListener("click", function () {
+    loadMisjudgeSamples();
+  });
+
+  $("btn-misjudge-clear").addEventListener("click", async function () {
+    if (!window.confirm("清空全部误判样本？清空后，相同内容会重新按规则词和模型判定。")) return;
+    try {
+      await callApi("misjudge", "POST", { action: "clear" });
+      toast("已清空误判样本");
+      loadMisjudgeSamples();
+    } catch (err) {
+      toast("清空失败：" + err.message);
     }
   });
 
@@ -1475,7 +2412,31 @@
       saveLexiconCategories();
     }
   });
-  $("btn-members").addEventListener("click", loadMembersPage);
+  $("btn-members").addEventListener("click", function () {
+    loadMembersPage();
+  });
+
+  $("btn-member-search").addEventListener("click", function () {
+    state.memberKeyword = ($("member-keyword").value || "").trim();
+    if (state.memberGroup) queryMembers(state.memberGroup, 1);
+    else toast("先查询一个群");
+  });
+
+  $("member-keyword").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") $("btn-member-search").click();
+  });
+
+  $("member-group").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") loadMembersPage();
+  });
+
+  $("members-prev").addEventListener("click", function () {
+    if (state.memberPage > 1) queryMembers(state.memberGroup, state.memberPage - 1);
+  });
+
+  $("members-next").addEventListener("click", function () {
+    queryMembers(state.memberGroup, state.memberPage + 1);
+  });
   $("member-group").addEventListener("keydown", function (event) {
     if (event.key === "Enter") loadMembersPage();
   });
@@ -1511,6 +2472,9 @@
     document.body.classList.add("light");
   }
 
+  initMemberActions();
+  initReviewPage();
+  initMediaViewer();
   switchPage("overview");
 })();
 </script>
